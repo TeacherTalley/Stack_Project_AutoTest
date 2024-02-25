@@ -1,0 +1,255 @@
+
+Menu: 
+	a: Add a movie to the queue
+	w: Watch the next movie in the queue
+	d: Delete the next movie from the queue
+	h: print the movie History
+	r: print the most Recently watched movie
+	q: print the movie Queue
+	n: print the Next movie to watch
+	x: eXit
+Enter a command: 
+
+Movie history:
+
+John Wick
+Hidden Figures
+Office Space
+Star Wars: A New Hope
+The Matrix
+The Sting
+Little Women
+Bill and Ted's Excellent Adventure
+The Lord of the Rings: The Fellowship of the Ring
+
+Menu: 
+	a: Add a movie to the queue
+	w: Watch the next movie in the queue
+	d: Delete the next movie from the queue
+	h: print the movie History
+	r: print the most Recently watched movie
+	q: print the movie Queue
+	n: print the Next movie to watch
+	x: eXit
+Enter a command: 
+
+Most recently watched movie: John Wick
+
+Menu: 
+	a: Add a movie to the queue
+	w: Watch the next movie in the queue
+	d: Delete the next movie from the queue
+	h: print the movie History
+	r: print the most Recently watched movie
+	q: print the movie Queue
+	n: print the Next movie to watch
+	x: eXit
+Enter a command: 
+
+Movie queue: 
+
+The Princess Bride
+Black Panther
+Big Trouble in Little China
+Frida
+Moneyball
+Shang-Chi and the Legend of the Ten Rings
+Tetris
+Barbie
+Oppenheimer
+Minority Report
+Magnificent Seven
+The Avengers
+Strange Brew
+Ex Machina
+Desperado
+Harry Potter and the Philosopher's Stone
+The Imitation Game
+
+Menu: 
+	a: Add a movie to the queue
+	w: Watch the next movie in the queue
+	d: Delete the next movie from the queue
+	h: print the movie History
+	r: print the most Recently watched movie
+	q: print the movie Queue
+	n: print the Next movie to watch
+	x: eXit
+Enter a command: 
+
+Next movie to watch: The Princess Bride
+
+Menu: 
+	a: Add a movie to the queue
+	w: Watch the next movie in the queue
+	d: Delete the next movie from the queue
+	h: print the movie History
+	r: print the most Recently watched movie
+	q: print the movie Queue
+	n: print the Next movie to watch
+	x: eXit
+Enter a command: 
+
+Enter a movie title: 
+Menu: 
+	a: Add a movie to the queue
+	w: Watch the next movie in the queue
+	d: Delete the next movie from the queue
+	h: print the movie History
+	r: print the most Recently watched movie
+	q: print the movie Queue
+	n: print the Next movie to watch
+	x: eXit
+Enter a command: 
+
+Movie queue: 
+
+The Princess Bride
+Black Panther
+Big Trouble in Little China
+Frida
+Moneyball
+Shang-Chi and the Legend of the Ten Rings
+Tetris
+Barbie
+Oppenheimer
+Minority Report
+Magnificent Seven
+The Avengers
+Strange Brew
+Ex Machina
+Desperado
+Harry Potter and the Philosopher's Stone
+The Imitation Game
+Blazing Saddles
+
+Menu: 
+	a: Add a movie to the queue
+	w: Watch the next movie in the queue
+	d: Delete the next movie from the queue
+	h: print the movie History
+	r: print the most Recently watched movie
+	q: print the movie Queue
+	n: print the Next movie to watch
+	x: eXit
+Enter a command: 
+
+Watching: The Princess Bride
+
+Menu: 
+	a: Add a movie to the queue
+	w: Watch the next movie in the queue
+	d: Delete the next movie from the queue
+	h: print the movie History
+	r: print the most Recently watched movie
+	q: print the movie Queue
+	n: print the Next movie to watch
+	x: eXit
+Enter a command: 
+
+Next movie to watch: Black Panther
+
+Menu: 
+	a: Add a movie to the queue
+	w: Watch the next movie in the queue
+	d: Delete the next movie from the queue
+	h: print the movie History
+	r: print the most Recently watched movie
+	q: print the movie Queue
+	n: print the Next movie to watch
+	x: eXit
+Enter a command: 
+
+Watching: Black Panther
+
+Menu: 
+	a: Add a movie to the queue
+	w: Watch the next movie in the queue
+	d: Delete the next movie from the queue
+	h: print the movie History
+	r: print the most Recently watched movie
+	q: print the movie Queue
+	n: print the Next movie to watch
+	x: eXit
+Enter a command: 
+
+Deleting: Big Trouble in Little China
+
+Menu: 
+	a: Add a movie to the queue
+	w: Watch the next movie in the queue
+	d: Delete the next movie from the queue
+	h: print the movie History
+	r: print the most Recently watched movie
+	q: print the movie Queue
+	n: print the Next movie to watch
+	x: eXit
+Enter a command: 
+
+Movie history:
+
+Black Panther
+The Princess Bride
+John Wick
+Hidden Figures
+Office Space
+Star Wars: A New Hope
+The Matrix
+The Sting
+Little Women
+Bill and Ted's Excellent Adventure
+The Lord of the Rings: The Fellowship of the Ring
+
+Menu: 
+	a: Add a movie to the queue
+	w: Watch the next movie in the queue
+	d: Delete the next movie from the queue
+	h: print the movie History
+	r: print the most Recently watched movie
+	q: print the movie Queue
+	n: print the Next movie to watch
+	x: eXit
+Enter a command: 
+
+Movie queue: 
+
+Frida
+Moneyball
+Shang-Chi and the Legend of the Ten Rings
+Tetris
+Barbie
+Oppenheimer
+Minority Report
+Magnificent Seven
+The Avengers
+Strange Brew
+Ex Machina
+Desperado
+Harry Potter and the Philosopher's Stone
+The Imitation Game
+Blazing Saddles
+
+Menu: 
+	a: Add a movie to the queue
+	w: Watch the next movie in the queue
+	d: Delete the next movie from the queue
+	h: print the movie History
+	r: print the most Recently watched movie
+	q: print the movie Queue
+	n: print the Next movie to watch
+	x: eXit
+Enter a command: 
+
+Invalid command. Please try again.
+
+Menu: 
+	a: Add a movie to the queue
+	w: Watch the next movie in the queue
+	d: Delete the next movie from the queue
+	h: print the movie History
+	r: print the most Recently watched movie
+	q: print the movie Queue
+	n: print the Next movie to watch
+	x: eXit
+Enter a command: 
+
