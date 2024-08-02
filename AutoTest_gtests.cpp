@@ -170,11 +170,12 @@ TEST(StackTest, Print)
 TEST(StackTest, CopyConstructor)
 {
     Stack<int> s1;
+    int elements = 2;
     s1.push(1);
     s1.push(2);
     Stack<int> s2(s1);
-    EXPECT_EQ(s2.size(), s1.size());
-    while (!s1.empty())
+    EXPECT_EQ(s2.size(), elements);
+    for (int i = 0; i < elements; i++)
     {
         EXPECT_EQ(s1.top(), s2.top());
         s1.pop();
@@ -186,14 +187,16 @@ TEST(StackTest, SaveRestore)
 {
     Stack<int> s1;
     const std::string filename = "stack.txt";
+    int elements = 3;
+
     s1.push(1);
     s1.push(2);
     s1.push(3);
     s1.save(filename);
     Stack<int> s2;
     s2.restore(filename);
-    EXPECT_EQ(s2.size(), s1.size());
-    while (!s1.empty())
+    EXPECT_EQ(s2.size(), elements);
+    for (int i = 0; i < elements; i++)
     {
         EXPECT_EQ(s1.top(), s2.top());
         s1.pop();
@@ -208,12 +211,14 @@ TEST(StackTest, SaveRestore)
     EXPECT_EQ(ss1.top(), "D E F");
     ss1.push("G");
     EXPECT_EQ(ss1.top(), "G");
-    EXPECT_EQ(ss1.size(), 3);
+    elements = 3;
+
+    EXPECT_EQ(ss1.size(), elements);
     ss1.save(filename);
     Stack<std::string> ss2;
     ss2.restore(filename);
-    EXPECT_EQ(ss2.size(), ss1.size());
-    while (!ss1.empty())
+    EXPECT_EQ(ss2.size(), elements);
+    for (int i = 0; i < elements; i++)
     {
         EXPECT_EQ(ss1.top(), ss2.top());
         ss1.pop();
@@ -336,19 +341,21 @@ TEST(QueueTest, SaveRestore)
 {
     Queue<int> q1;
     const std::string filename = "queue.txt";
+    int elements = 3;
+
     q1.enqueue(1);
     q1.enqueue(2);
     q1.enqueue(3);
     q1.save(filename);
     Queue<int> q2;
     q2.restore(filename);
-    EXPECT_EQ(q2.size(), q1.size());
-    while (!q1.empty())
-    {
-        EXPECT_EQ(q1.front(), q2.front());
-        q1.dequeue();
-        q2.dequeue();
-    }
+    EXPECT_EQ(q2.size(), elements);
+    for (int i = 0; i < elements; i++)
+        {
+            EXPECT_EQ(q1.front(), q2.front());
+            q1.dequeue();
+            q2.dequeue();
+        }
     std::remove(filename.c_str());
 
     Queue<std::string> sq1;
@@ -358,16 +365,18 @@ TEST(QueueTest, SaveRestore)
     EXPECT_EQ(sq1.front(), "A B C");
     sq1.enqueue("G");
     EXPECT_EQ(sq1.front(), "A B C");
-    EXPECT_EQ(sq1.size(), 3);
+    elements = 3;
+
+    EXPECT_EQ(sq1.size(), elements);
     sq1.save(filename);
     Queue<std::string> ss2;
     ss2.restore(filename);
-    EXPECT_EQ(ss2.size(), sq1.size());
-    while (!sq1.empty())
-    {
-        EXPECT_EQ(sq1.front(), ss2.front());
-        sq1.dequeue();
-        ss2.dequeue();
-    }
+    EXPECT_EQ(ss2.size(), elements);
+    for (int i = 0; i < elements; i++)
+        {
+            EXPECT_EQ(sq1.front(), ss2.front());
+            sq1.dequeue();
+            ss2.dequeue();
+        }
     std::remove(filename.c_str());
 }
