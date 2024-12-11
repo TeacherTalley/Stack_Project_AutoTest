@@ -3,11 +3,32 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
+# Visual Studio Code (Windows)
+*.exe
+*.ilk
+*.obj
+*.pdb
+*.dSYM*
+*.sln
+*.suo
+*.vcxproj*
+x64
+.vs*
+*.VC*
+*.vs*
+~$*
+
+# Visual Studio Project files
+Project*
+project*
+
 # VS Code ignores
 .vscode
-*.dSYM
-build
+*.dSYM*
 .DS_Store
+
+# Build directory
+build
 
 # generated executables
 main
@@ -17,4 +38,7 @@ AutoTest_gtests
 main.cpp
 Stack.h
 Queue.h
+
+# Ignore local testing directory
+local_testing
 

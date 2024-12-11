@@ -32,7 +32,6 @@ PROJECT = 'Stack_Project_AutoTest'
 BUILD = 'build'
 TEST_DIR = os.path.join(PROJECT, BUILD)
 EXECUTABLE = './main'
-# DIFF = 'diff --ignore-case --ignore-blank-lines --side-by-side  --ignore-space-change  --suppress-common-lines --color=always'
 
 DATA_DIR = '..'
 AUTOTEST_MOVIE_QUEUE_FILE = 'AutoTest_movie_queue.txt'
@@ -74,17 +73,66 @@ ADD_MOVIE = 'Black Widow'
 #--------------------------------------------------------------------------
 # Helper functions
 #--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+# Font colors for terminal output
+#--------------------------------------------------------------------------
+BLUE = '\033[34m'
+RED = '\033[31m'
+GREEN = '\033[32m'
+RESET = '\033[0m'
 
-def execute_command(cmd, args=None):
+def report_failure(msg):
     """
-    Executes a command and returns the return code.
-
-    Args:
-        cmd (str): The command to be executed.
-        args (object): Optional arguments.
-
+    Prints a failure message in red font.
+    Parameters:
+         msg (str): The message to print.
     Returns:
-        int: The return code of the command execution.
+         None
+    """
+    print(f'{RED}[----------]{RESET}')
+    print(f'{RED}[  FAILED  ] {msg}{RESET}')
+    print(f'{RED}[----------]{RESET}')
+    return
+
+def report_success(msg):
+    """
+    Prints a success message in green font.
+    Parameters:
+         msg (str): The message to print.
+    Returns:
+         None
+    """
+    print(f'{GREEN}[----------]{RESET}')
+    print(f'{GREEN}[  PASSED  ] {msg}{RESET}')
+    print(f'{GREEN}[----------]{RESET}')
+    return
+
+def report_info(msg, color=RESET):
+    """
+    Prints an informational message in the specified font color.
+    Parameters:
+         msg (str): The message to print.
+         color (str): The font color to use. Defaults to GREEN.
+    Returns:
+         None
+    """
+    print(f'{color}{msg}{RESET}')
+    return
+
+
+def execute_command(cmd, args=None, accept_rc=[0]):
+    """
+    Executes a shell command and provides verbose and debug output based on the given arguments.
+    Parameters:
+         cmd (str): The shell command to execute.
+         args (object, optional): An object containing verbose and debug flags. Defaults to None.
+         accept_rc (list, optional): A list of acceptable return codes. Defaults to [0].
+    Returns:
+         int: The return code of the executed command.
+    Behavior:
+    - If `args.verbose` is True, prints the command execution details.
+    - If `args.debug` is False, executes the command using `subprocess.call`.
+    - If `args.verbose` is True, prints the result of the command execution, including specific messages for segmentation faults (rc=139) and uncaught exceptions (rc=134).
     """
     rc = 0
 
@@ -93,9 +141,23 @@ def execute_command(cmd, args=None):
         args.debug = False
 
     if args.verbose:
-        print(f'Executing: {cmd}')
+        # print(f'Executing: {cmd}')
+        print(f'{GREEN}[==========]{RESET}')
+        print(f'{GREEN}[ EXECUTE  ] {cmd}{RESET}')
+        print(f'{GREEN}[==========]{RESET}')
+
     if not args.debug:
         rc = subprocess.call(cmd, shell=True)
+
+    if args.verbose:
+        if rc == 139:
+            report_failure('Segmentation Fault')
+        elif rc == 134:
+            report_failure('Uncaught Exception')
+        elif rc not in accept_rc:
+            report_failure(f'rc = {rc}')
+        else:
+            report_success(f'rc = {rc}')
     return rc
 
 def file_print(file, args=None):
@@ -129,7 +191,8 @@ def file_diff(file1, file2, diff_args=None, args=None):
     """
     diffcmd = 'diff'
     if not diff_args:
-        diff_args = '--ignore-case --ignore-blank-lines --side-by-side  --ignore-space-change  --suppress-common-lines --color=always'
+        # diff_args = '--ignore-case --ignore-blank-lines --side-by-side  --ignore-space-change  --suppress-common-lines --color=always'
+        diff_args = '--ignore-case --ignore-blank-lines --side-by-side  --ignore-space-change --color=always'
     cmd = f'{diffcmd} {diff_args} {file1} {file2}'
     rc = execute_command(cmd, args)
     return rc
@@ -150,20 +213,22 @@ def file_contains_file(file, searchfile, args=None):
         args.verbose = False
         args.debug = False
 
-    if args.verbose:
-        print(f'Executing: Check file {file} contains file {searchfile}')
+#    if args.verbose:
+#        report_info(f'Check file {file} contains file {searchfile}')
 
     with open(file, 'r') as f:
         filedata = f.read()
     with open(searchfile, 'r') as f:
         searchdata = f.read()
     if searchdata in filedata:
+        if args.verbose:
+            report_success(f'{searchfile} found in {file}')
         return 0
     else:
         if args.verbose:
-            print(f'ERROR: {searchfile} not found in {file}')
-            print(f'\nExpected:\n{searchdata}')
-            print(f'\nActual:\n{filedata}')
+            report_failure(f'{searchfile} not found in {file}')
+            report_info(f'\nExpected:\n{searchdata}')
+            report_info(f'\nActual:\n{filedata}')
         return 1
 
 def file_contains_string(file, searchstring, args=None):
@@ -182,18 +247,20 @@ def file_contains_string(file, searchstring, args=None):
         args.verbose = False
         args.debug = False
 
-    if args.verbose:
-        print(f'Executing: Check file {file} contains {searchstring}')
+#    if args.verbose:
+#        report_info(f'Check file {file} contains "{searchstring}"')
 
     with open(file, 'r') as f:
         filedata = f.read()
     if searchstring in filedata:
+        if args.verbose:
+            report_success(f'{searchstring} found in {file}')
         return 0
     else:
         if args.verbose:
-            print(f'ERROR: {searchstring} not found in {file}')
-            print(f'\nExpected:\n{searchstring}')
-            print(f'\nActual:\n{filedata}')
+            report_failure(f'"{searchstring}" not found in {file}')
+            report_info(f'\nExpected:\n{searchstring}')
+            report_info(f'\nActual:\n{filedata}')
         return 1
 
 def file_contains_regex(file, searchstring, args=None):
@@ -212,18 +279,20 @@ def file_contains_regex(file, searchstring, args=None):
         args.verbose = False
         args.debug = False
 
-    if args.verbose:
-        print(f'Executing: Check file {file} contains {searchstring}')
+#    if args.verbose:
+#        report_info(f'Check file {file} contains regex "{searchstring}"')
 
     with open(file, 'r') as f:
         filedata = f.read()
     if re.search(searchstring, filedata):
+        if args.verbose:
+            report_success(f'Regex "{searchstring}" found in {file}')
         return 0
     else:
         if args.verbose:
-            print(f'ERROR: {searchstring} not found in {file}')
-            print(f'\nExpected:\n{searchstring}')
-            print(f'\nActual:\n{filedata}')
+            report_failure(f'Regex "{searchstring}" not found in {file}')
+            report_info(f'\nExpected:\nRegex {searchstring}')
+            report_info(f'\nActual:\n{filedata}')
         return 1
 
 import shutil
@@ -243,7 +312,7 @@ def file_copy(src, dest, args=None):
     try:
         shutil.copyfile(src, dest)
     except:
-        print(f'ERROR: Unable to copy {src} to {dest}')
+        report_failure(f'Unable to copy {src} to {dest}')
         return 1
     return 0
 
@@ -286,10 +355,10 @@ def setup(args):
         try:
             os.chdir(TEST_DIR)
         except:
-            print(f'ERROR: Unable to change directory to: {TEST_DIR}')
+            report_failure(f'Unable to change directory to: {TEST_DIR}')
             sys.exit(1)
     if args.debug:
-        print(f'\nsetup: Changed directory to: {os.getcwd()}')
+        report_info(f'\nsetup: Changed directory to: {os.getcwd()}')
     return
 
 
@@ -308,10 +377,10 @@ def cleanup(args):
         try:
             os.chdir(PARENT_PROJECT)
         except:
-            print(f'ERROR: Unable to change directory to: {".."}')
+            report_failure(f'Unable to change directory to: {".."}')
             sys.exit(1)
     if args.debug:
-        print(f'\ncleanup: Changed directory to: {os.getcwd()}')
+        report_info(f'\ncleanup: Changed directory to: {os.getcwd()}')
     return
 
 
@@ -337,7 +406,7 @@ def test_missing_file(args):
     autotest_file = os.path.join(DATA_DIR, AUTOTEST_MAIN_MISSING_FILE)
 
     if not file_exists(autotest_file):
-        print(f'ERROR: {autotest_file} not found')
+        report_failure(f'{autotest_file} not found')
         return 1
 
     # check that the updated movie queue file contains the new movie
@@ -356,6 +425,7 @@ def test_exit(args):
         int: Return code indicating the success or failure of the test.
     """
     if (copy_test_input_files() != 0):
+        report_failure(f'Unable to copy test input files')
         return 1
 
     user_cmd = 'exit'
@@ -371,10 +441,6 @@ def test_exit(args):
     # run the program
     cmd = f'{EXECUTABLE} < {input_file} > {test_output_file} 2>&1'
     rc = execute_command(cmd, args)
-    if rc != 0:
-        if args.verbose:
-            print(f'FAILED (rc={rc}): {cmd}')
-        return rc
     
     return rc
 
@@ -390,6 +456,7 @@ def test_add(args):
         int: Return code indicating the success or failure of the test.
     """
     if (copy_test_input_files() != 0):
+        report_failure(f'Unable to copy test input files')
         return 1
 
     user_cmd = 'add'
@@ -411,7 +478,7 @@ def test_add(args):
     # make a copy of the movie queue file
     rc = file_copy(STUDENT_MOVIE_QUEUE_FILE, autotest_queue_file, args=args)
     if rc != 0:
-        print(f'ERROR: {autotest_queue_file} not constructed')
+        report_failure(f'{autotest_queue_file} not constructed')
         return rc
 
     # append the new movie to the test movie queue file
@@ -422,12 +489,10 @@ def test_add(args):
     cmd = f'{EXECUTABLE} < {input_file} > {test_output_file} 2>&1'
     rc = execute_command(cmd, args)
     if rc != 0:
-        if args.verbose:
-            print(f'FAILED (rc={rc}): {cmd}')
         return rc
     
     if args.verbose:
-        print(f'Checking {movie} is appended to {STUDENT_MOVIE_QUEUE_FILE}')
+        report_info(f'Checking {movie} is appended to {STUDENT_MOVIE_QUEUE_FILE}')
 
     # check that the updated movie queue file contains the new movie
     rc = file_diff(autotest_queue_file, 
@@ -447,6 +512,7 @@ def test_watch(args):
         int: Return code indicating the success or failure of the test.
     """
     if (copy_test_input_files() != 0):
+        report_failure(f'Unable to copy test input files')
         return 1
 
     user_cmd = 'watch'
@@ -467,7 +533,7 @@ def test_watch(args):
     # make a copy of the movie queue file
     rc = file_copy(STUDENT_MOVIE_QUEUE_FILE, autotest_queue_file, args=args)
     if rc != 0:
-        print(f'ERROR: {autotest_queue_file} not constructed')
+        report_failure(f'{autotest_queue_file} not constructed')
         return rc
 
     # extract filename from STUDENT_MOVIE_HISTORY_FILE without file extension
@@ -476,7 +542,7 @@ def test_watch(args):
     # make a copy of the movie history file
     rc = file_copy(STUDENT_MOVIE_HISTORY_FILE, autotest_history_file, args=args)
     if rc != 0:
-        print(f'ERROR: {autotest_history_file} not constructed')
+        report_failure(f'{autotest_history_file} not constructed')
         return rc
     
     # remove the first movie from the test movie queue file
@@ -499,32 +565,28 @@ def test_watch(args):
     cmd = f'{EXECUTABLE} < {input_file} > {test_output_file} 2>&1'
     rc = execute_command(cmd, args)
     if rc != 0:
-        if args.verbose:
-            print(f'FAILED (rc={rc}): {cmd}')
         return rc 
 
     # check that the updated movie queue file does not contain the first movie
     if args.verbose:
-        print(f'Checking {movie} is not in {STUDENT_MOVIE_QUEUE_UPDATE_FILE}')
+        report_info(f'Checking {movie} is not in {STUDENT_MOVIE_QUEUE_UPDATE_FILE}')
 
     rc = file_diff(autotest_queue_file, 
                    STUDENT_MOVIE_QUEUE_UPDATE_FILE,
                    args=args)
     if rc != 0:
-        if args.verbose:
-            print(f'ERROR: {movie} not removed from {STUDENT_MOVIE_QUEUE_UPDATE_FILE}')
+        report_failure(f'{movie} not removed from {STUDENT_MOVIE_QUEUE_UPDATE_FILE}')
         return rc 
 
     # check that the updated movie history file contains the first movie
     if args.verbose:
-        print(f'Checking {movie} is in {STUDENT_MOVIE_HISTORY_UPDATE_FILE}')
+        report_info(f'Checking {movie} is in {STUDENT_MOVIE_HISTORY_UPDATE_FILE}')
 
     rc = file_diff(autotest_history_file, 
                    STUDENT_MOVIE_HISTORY_UPDATE_FILE,
                    args=args)
     if rc != 0:
-        if args.verbose:
-            print(f'ERROR: {movie} not added to {STUDENT_MOVIE_HISTORY_UPDATE_FILE}')
+        report_failure(f'{movie} not added to {STUDENT_MOVIE_HISTORY_UPDATE_FILE}')
         return rc 
 
     return rc
@@ -541,6 +603,7 @@ def test_delete(args):
         int: Return code indicating the success or failure of the test.
     """
     if (copy_test_input_files() != 0):
+        report_failure(f'Unable to copy test input files')
         return 1
 
     user_cmd = 'delete'
@@ -561,7 +624,7 @@ def test_delete(args):
     # make a copy of the movie queue file
     rc = file_copy(STUDENT_MOVIE_QUEUE_FILE, autotest_queue_file, args=args)
     if rc != 0:
-        print(f'ERROR: {autotest_queue_file} not constructed')
+        report_failure(f'{autotest_queue_file} not constructed')
         return rc
 
     # extract filename from STUDENT_MOVIE_HISTORY_FILE without file extension
@@ -570,7 +633,7 @@ def test_delete(args):
     # make a copy of the movie history file
     rc = file_copy(STUDENT_MOVIE_HISTORY_FILE, autotest_history_file, args=args)
     if rc != 0:
-        print(f'ERROR: {autotest_history_file} not constructed')
+        report_failure(f'{autotest_history_file} not constructed')
         return rc
 
     # remove the first movie from the test movie queue file
@@ -586,32 +649,28 @@ def test_delete(args):
     cmd = f'{EXECUTABLE} < {input_file} > {test_output_file} 2>&1'
     rc = execute_command(cmd, args)
     if rc != 0:
-        if args.verbose:
-            print(f'FAILED (rc={rc}): {cmd}')
         return rc
     
     # check that the updated movie queue file does not contain the first movie
     if args.verbose:
-        print(f'Checking {movie} is not in {STUDENT_MOVIE_QUEUE_UPDATE_FILE}')
+        report_info(f'Checking {movie} is not in {STUDENT_MOVIE_QUEUE_UPDATE_FILE}')
 
     rc = file_diff(autotest_queue_file, 
                    STUDENT_MOVIE_QUEUE_UPDATE_FILE,
                    args=args)
     if rc != 0:
-        if args.verbose:
-            print(f'ERROR: {movie} not removed from {STUDENT_MOVIE_QUEUE_UPDATE_FILE}')
+        report_failure(f'{movie} not removed from {STUDENT_MOVIE_QUEUE_UPDATE_FILE}')
         return rc 
     
     # make sure the updated movie history file is the same as the original
     if args.verbose:
-        print(f'Checking {movie} is not in {STUDENT_MOVIE_HISTORY_UPDATE_FILE}')
+        report_info(f'Checking {movie} is not in {STUDENT_MOVIE_HISTORY_UPDATE_FILE}')
 
     rc = file_diff(autotest_history_file, 
                    STUDENT_MOVIE_HISTORY_UPDATE_FILE,
                    args=args)
     if rc != 0:
-        if args.verbose:
-            print(f'ERROR: {movie} present in {STUDENT_MOVIE_HISTORY_UPDATE_FILE}')
+        report_failure(f'{movie} present in {STUDENT_MOVIE_HISTORY_UPDATE_FILE}')
         return rc 
     
     return rc
@@ -628,6 +687,7 @@ def test_history(args):
         int: Return code indicating the success or failure of the test.
     """
     if (copy_test_input_files() != 0):
+        report_failure(f'Unable to copy test input files')
         return 1
 
     user_cmd = 'history'
@@ -644,13 +704,11 @@ def test_history(args):
     cmd = f'{EXECUTABLE} < {input_file} > {test_output_file} 2>&1'
     rc = execute_command(cmd, args)
     if rc != 0:
-        if args.verbose:
-            print(f'FAILED (rc={rc}): {cmd}')
         return rc
     
     # check that the updated movie queue file does not contain the first movie
     if args.verbose:
-        print(f'Checking if history is in {test_output_file}')
+        report_info(f'Checking if history is in {test_output_file}')
 
     rc = file_contains_file(test_output_file, STUDENT_MOVIE_HISTORY_FILE, args=args)
     return rc
@@ -667,6 +725,7 @@ def test_recent(args):
         int: Return code indicating the success or failure of the test.
     """
     if (copy_test_input_files() != 0):
+        report_failure(f'Unable to copy test input files')
         return 1
 
     user_cmd = 'recent'
@@ -688,13 +747,11 @@ def test_recent(args):
     cmd = f'{EXECUTABLE} < {input_file} > {test_output_file} 2>&1'
     rc = execute_command(cmd, args)
     if rc != 0:
-        if args.verbose:
-            print(f'FAILED (rc={rc}): {cmd}')
         return rc
     
     # check that the updated movie queue file does not contain the first movie
     if args.verbose:
-        print(f'Checking if {movie} is in {test_output_file}')
+        report_info(f'Checking if {movie} is in {test_output_file}')
 
     rc = file_contains_string(test_output_file, movie, args=args)
     return rc
@@ -711,6 +768,7 @@ def test_queue(args):
         int: Return code indicating the success or failure of the test.
     """
     if (copy_test_input_files() != 0):
+        report_failure(f'Unable to copy test input files')
         return 1
 
     user_cmd = 'queue'
@@ -727,13 +785,11 @@ def test_queue(args):
     cmd = f'{EXECUTABLE} < {input_file} > {test_output_file} 2>&1'
     rc = execute_command(cmd, args)
     if rc != 0:
-        if args.verbose:
-            print(f'FAILED (rc={rc}): {cmd}')
         return rc
     
     # check that the updated movie queue file does not contain the first movie
     if args.verbose:
-        print(f'Checking if queue is in {test_output_file}')
+        report_info(f'Checking if queue is in {test_output_file}')
 
     rc = file_contains_file(test_output_file, STUDENT_MOVIE_QUEUE_FILE, args=args)
     return rc
@@ -750,6 +806,7 @@ def test_next(args):
         int: Return code indicating the success or failure of the test.
     """
     if (copy_test_input_files() != 0):
+        report_failure(f'Unable to copy test input files')
         return 1
 
     user_cmd = 'next'
@@ -771,13 +828,11 @@ def test_next(args):
     cmd = f'{EXECUTABLE} < {input_file} > {test_output_file} 2>&1'
     rc = execute_command(cmd, args)
     if rc != 0:
-        if args.verbose:
-            print(f'FAILED (rc={rc}): {cmd}')
         return rc
     
     # check that the updated movie queue file does not contain the first movie
     if args.verbose:
-        print(f'Checking if {movie} is in {test_output_file}')
+        report_info(f'Checking if {movie} is in {test_output_file}')
 
     rc = file_contains_string(test_output_file, movie, args=args)
     return rc
@@ -791,11 +846,15 @@ def test_next(args):
 #--------------------------------------------------------------------------
 def banner(msg, args):
     if args.verbose:
-        print(f'\n{"-"*10} TEST: {msg} {"-"*40}\n')
+        print(f'{BLUE}[==========]{RESET}')
+        print(f'{BLUE}[   TEST   ] {msg}{RESET}')
+        print(f'{BLUE}[==========]{RESET}')
 
 def footer(msg, rc, args):
     if args.verbose:
-        print(f'\n{"-"*10} END: {msg} rc: {rc} {"-"*35}\n') 
+        print(f'{BLUE}[==========]{RESET}')
+        print(f'{BLUE}[   END    ] {msg} rc: {rc}{RESET}')
+        print(f'{BLUE}[==========]{RESET}')
 
 def parse_arguments():
     parser = argparse.ArgumentParser()
@@ -832,14 +891,12 @@ def test_main():
     else:
         tests = args.test
 
-    if args.verbose:
-        print(f"\nRunning tests: {tests}...\n")
     for test in tests:
         banner(test, args)
         try:
             rc = globals()[test](args)
         except NameError:
-            print(f"ERROR: Test function {test} not found.")
+            report_failure(f'Test function {test} not found.')
             rc = 0
         footer(test, rc, args)
 
