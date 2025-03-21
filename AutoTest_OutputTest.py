@@ -1,9 +1,15 @@
 #!/usr/bin/env python
-#--------------------------------------------------------------------------
-# File: AutoTest_OutputTest.py
-# Programmer: Michelle Talley
-# Copyright 2024 Michelle Talley University of Central Arkansas
-#--------------------------------------------------------------------------
+"""
+AutoTest_OutputTest.py
+
+This module contains automated tests for the Stack Project. It includes functions
+to set up the test environment, execute various test cases, and clean up after tests.
+The tests cover functionalities such as adding, watching, deleting, and querying movies
+in a movie queue system.
+
+Author: Michelle Talley
+Copyright 2024 Michelle Talley University of Central Arkansas
+"""
 import sys
 import os
 import subprocess
@@ -16,11 +22,11 @@ import re
 # list all test cases to be executed here - modify as needed
 #--------------------------------------------------------------------------
 TEST_CASES = ['test_exit',
-              'test_add', 
-              'test_watch', 
-              'test_delete', 
-              'test_history', 
-              'test_recent', 
+              'test_add',
+              'test_watch',
+              'test_delete',
+              'test_history',
+              'test_recent',
               'test_queue',
               'test_next']
 
@@ -56,10 +62,10 @@ STUDENT_MOVIE_HISTORY_UPDATE_FILE = 'movie_history_updated.txt'
 #--------------------------------------------------------------------------
 # Program commands - modify as needed
 #--------------------------------------------------------------------------
-USER_COMMANDS = {'add': 'a', 
-                 'watch': 'w', 
-                 'delete': 'd', 
-                 'history': 'h', 
+USER_COMMANDS = {'add': 'a',
+                 'watch': 'w',
+                 'delete': 'd',
+                 'history': 'h',
                  'recent': 'r',
                  'queue': 'q',
                  'next': 'n',
@@ -120,28 +126,36 @@ def report_info(msg, color=RESET):
     return
 
 
-def execute_command(cmd, args=None, accept_rc=[0]):
+def execute_command(cmd, args=None, accept_rc=None):
     """
-    Executes a shell command and provides verbose and debug output based on the given arguments.
+    Executes a shell command and provides verbose and debug output based upon
+    the given arguments.
+
     Parameters:
          cmd (str): The shell command to execute.
-         args (object, optional): An object containing verbose and debug flags. Defaults to None.
-         accept_rc (list, optional): A list of acceptable return codes. Defaults to [0].
+         args (object, optional): An object containing verbose and debug flags.
+            Defaults to None.
+         accept_rc (list, optional): A list of acceptable return codes.
+            Defaults to [0].
     Returns:
          int: The return code of the executed command.
     Behavior:
     - If `args.verbose` is True, prints the command execution details.
     - If `args.debug` is False, executes the command using `subprocess.call`.
-    - If `args.verbose` is True, prints the result of the command execution, including specific messages for segmentation faults (rc=139) and uncaught exceptions (rc=134).
+    - If `args.verbose` is True, prints the result of the command execution,
+        including specific messages for segmentation faults (rc=139)
+        and uncaught exceptions (rc=134).
     """
     rc = 0
+
+    if accept_rc is None:
+        accept_rc = [0]
 
     if not args:
         args.verbose = False
         args.debug = False
 
     if args.verbose:
-        # print(f'Executing: {cmd}')
         print(f'{GREEN}[==========]{RESET}')
         print(f'{GREEN}[ EXECUTE  ] {cmd}{RESET}')
         print(f'{GREEN}[==========]{RESET}')
@@ -160,21 +174,22 @@ def execute_command(cmd, args=None, accept_rc=[0]):
             report_success(f'rc = {rc}')
     return rc
 
-def file_print(file, args=None):
+
+def file_print(file):
     """
     Prints the contents of a file.
 
     Args:
         file (str): The path of the file to be printed.
-        args (optional): Additional arguments (not used in this function).
 
     Returns:
         None
     """
-    with open(file, 'r') as f:
+    with open(file, 'r', encoding='utf-8') as f:
         filedata = f.read()
     print(filedata)
     return
+
 
 def file_diff(file1, file2, diff_args=None, args=None):
     """
@@ -183,19 +198,22 @@ def file_diff(file1, file2, diff_args=None, args=None):
     Args:
         file1 (str): Path to the first file.
         file2 (str): Path to the second file.
-        diff_args (str, optional): Additional arguments for the diff command. Defaults to None.
-        args (str, optional): Additional arguments for the execute_command function. Defaults to None.
+        diff_args (str, optional): Additional arguments for the diff command.
+            Defaults to None.
+        args (str, optional): Additional arguments for the execute_command function.
+            Defaults to None.
 
     Returns:
         int: Return code of the execute_command function.
     """
     diffcmd = 'diff'
     if not diff_args:
-        # diff_args = '--ignore-case --ignore-blank-lines --side-by-side  --ignore-space-change  --suppress-common-lines --color=always'
-        diff_args = '--ignore-case --ignore-blank-lines --side-by-side  --ignore-space-change --color=always'
+        diff_args = '--ignore-case --ignore-blank-lines --side-by-side ' \
+                    '--ignore-space-change --color=always'
     cmd = f'{diffcmd} {diff_args} {file1} {file2}'
     rc = execute_command(cmd, args)
     return rc
+
 
 def file_contains_file(file, searchfile, args=None):
     """
@@ -216,9 +234,9 @@ def file_contains_file(file, searchfile, args=None):
 #    if args.verbose:
 #        report_info(f'Check file {file} contains file {searchfile}')
 
-    with open(file, 'r') as f:
+    with open(file, 'r', encoding='utf-8') as f:
         filedata = f.read()
-    with open(searchfile, 'r') as f:
+    with open(searchfile, 'r', encoding='utf-8') as f:
         searchdata = f.read()
     if searchdata in filedata:
         if args.verbose:
@@ -230,6 +248,7 @@ def file_contains_file(file, searchfile, args=None):
             report_info(f'\nExpected:\n{searchdata}')
             report_info(f'\nActual:\n{filedata}')
         return 1
+
 
 def file_contains_string(file, searchstring, args=None):
     """
@@ -250,7 +269,7 @@ def file_contains_string(file, searchstring, args=None):
 #    if args.verbose:
 #        report_info(f'Check file {file} contains "{searchstring}"')
 
-    with open(file, 'r') as f:
+    with open(file, 'r', encoding='utf-8') as f:
         filedata = f.read()
     if searchstring in filedata:
         if args.verbose:
@@ -262,6 +281,7 @@ def file_contains_string(file, searchstring, args=None):
             report_info(f'\nExpected:\n{searchstring}')
             report_info(f'\nActual:\n{filedata}')
         return 1
+
 
 def file_contains_regex(file, searchstring, args=None):
     """
@@ -282,7 +302,7 @@ def file_contains_regex(file, searchstring, args=None):
 #    if args.verbose:
 #        report_info(f'Check file {file} contains regex "{searchstring}"')
 
-    with open(file, 'r') as f:
+    with open(file, 'r', encoding='utf-8') as f:
         filedata = f.read()
     if re.search(searchstring, filedata):
         if args.verbose:
@@ -295,36 +315,60 @@ def file_contains_regex(file, searchstring, args=None):
             report_info(f'\nActual:\n{filedata}')
         return 1
 
-import shutil
 
-def file_copy(src, dest, args=None):
+def file_copy(src, dest):
     """
     Copy a file from the source path to the destination path.
 
     Args:
         src (str): The path of the source file.
         dest (str): The path of the destination file.
-        args (optional): Additional arguments (not used in this function).
 
     Returns:
         int: 0 if the file copy is successful, 1 otherwise.
     """
     try:
         shutil.copyfile(src, dest)
-    except:
-        report_failure(f'Unable to copy {src} to {dest}')
+    except shutil.Error as err:
+        report_failure(f'Unable to copy {src} to {dest}: {err}')
         return 1
     return 0
 
-def file_exists(file, args=None):
+
+def file_exists(file):
+    """
+    Check if a file exists at the given path.
+
+    Args:
+        file (str): The path to the file.
+
+    Returns:
+        bool: True if the file exists, False otherwise.
+    """
     return os.path.exists(file)
 
-def file_remove(file, args=None):
+
+def file_remove(file):
+    """
+    Remove a file if it exists at the given path.
+
+    Args:
+        file (str): The path to the file.
+
+    Returns:
+        None
+    """
     if file_exists(file):
         os.remove(file)
     return
 
 def copy_test_input_files():
+    """
+    Copy test input files from the data directory to the current directory.
+
+    Returns:
+        int: 0 if the files are copied successfully, 1 otherwise.
+    """
     # make sure the data files exist; overwrite if necessary
     for file, testfile in zip(DATAFILES, TESTDATAFILES):
         rc = file_copy(os.path.join(DATA_DIR, testfile), file)
@@ -354,8 +398,8 @@ def setup(args):
     if not cwd.endswith(TEST_DIR):
         try:
             os.chdir(TEST_DIR)
-        except:
-            report_failure(f'Unable to change directory to: {TEST_DIR}')
+        except OSError as err:
+            report_failure(f'Unable to change directory to: {TEST_DIR}. Exception: {err}')
             sys.exit(1)
     if args.debug:
         report_info(f'\nsetup: Changed directory to: {os.getcwd()}')
@@ -376,8 +420,9 @@ def cleanup(args):
     if cwd.endswith(TEST_DIR):
         try:
             os.chdir(PARENT_PROJECT)
-        except:
-            report_failure(f'Unable to change directory to: {".."}')
+        except OSError as err:
+            report_failure(
+                f'Unable to change directory to: {TEST_DIR}. Exception: {err}')
             sys.exit(1)
     if args.debug:
         report_info(f'\ncleanup: Changed directory to: {os.getcwd()}')
@@ -424,8 +469,8 @@ def test_exit(args):
     Returns:
         int: Return code indicating the success or failure of the test.
     """
-    if (copy_test_input_files() != 0):
-        report_failure(f'Unable to copy test input files')
+    if copy_test_input_files() != 0:
+        report_failure('Unable to copy test input files')
         return 1
 
     user_cmd = 'exit'
@@ -433,15 +478,15 @@ def test_exit(args):
     # build the command sequence into a string
     test_cmd = f'{USER_COMMANDS["exit"]}\n'
     input_file = f'test_input_{user_cmd}.txt'
-    with open(input_file, 'w') as f:
+    with open(input_file, 'w', encoding='utf-8') as f:
         f.write(test_cmd)
-    
+
     test_output_file = f'test_output_{user_cmd}.txt'
 
     # run the program
     cmd = f'{EXECUTABLE} < {input_file} > {test_output_file} 2>&1'
     rc = execute_command(cmd, args)
-    
+
     return rc
 
 
@@ -455,8 +500,8 @@ def test_add(args):
     Returns:
         int: Return code indicating the success or failure of the test.
     """
-    if (copy_test_input_files() != 0):
-        report_failure(f'Unable to copy test input files')
+    if copy_test_input_files() != 0:
+        report_failure('Unable to copy test input files')
         return 1
 
     user_cmd = 'add'
@@ -465,24 +510,24 @@ def test_add(args):
     movie = ADD_MOVIE
     test_cmd = f'{USER_COMMANDS[user_cmd]}\n{movie}\n{USER_COMMANDS["exit"]}\n'
     input_file = f'test_input_{user_cmd}.txt'
-    with open(input_file, 'w') as f:
+    with open(input_file, 'w', encoding='utf-8') as f:
         f.write(test_cmd)
-    
+
     test_output_file = f'test_output_{user_cmd}.txt'
 
     # identify the test output file using the user command
-    
+
     # extract filename from STUDENT_MOVIE_QUEUE_FILE without file extension
     autotest_queue_file = f'{os.path.splitext(STUDENT_MOVIE_QUEUE_FILE)[0]}_{user_cmd}.txt'
 
     # make a copy of the movie queue file
-    rc = file_copy(STUDENT_MOVIE_QUEUE_FILE, autotest_queue_file, args=args)
+    rc = file_copy(STUDENT_MOVIE_QUEUE_FILE, autotest_queue_file)
     if rc != 0:
         report_failure(f'{autotest_queue_file} not constructed')
         return rc
 
     # append the new movie to the test movie queue file
-    with open(autotest_queue_file, 'a') as f:
+    with open(autotest_queue_file, 'a', encoding='utf-8') as f:
         f.write(f'{movie}\n')
 
     # run the program
@@ -490,12 +535,12 @@ def test_add(args):
     rc = execute_command(cmd, args)
     if rc != 0:
         return rc
-    
+
     if args.verbose:
         report_info(f'Checking {movie} is appended to {STUDENT_MOVIE_QUEUE_FILE}')
 
     # check that the updated movie queue file contains the new movie
-    rc = file_diff(autotest_queue_file, 
+    rc = file_diff(autotest_queue_file,
                    STUDENT_MOVIE_QUEUE_UPDATE_FILE,
                    args=args)
     return rc
@@ -511,8 +556,8 @@ def test_watch(args):
     Returns:
         int: Return code indicating the success or failure of the test.
     """
-    if (copy_test_input_files() != 0):
-        report_failure(f'Unable to copy test input files')
+    if copy_test_input_files() != 0:
+        report_failure('Unable to copy test input files')
         return 1
 
     user_cmd = 'watch'
@@ -520,18 +565,18 @@ def test_watch(args):
     # build the command sequence into a string
     test_cmd = f'{USER_COMMANDS[user_cmd]}\n{USER_COMMANDS["exit"]}\n'
     input_file = f'test_input_{user_cmd}.txt'
-    with open(input_file, 'w') as f:
+    with open(input_file, 'w', encoding='utf-8') as f:
         f.write(test_cmd)
-    
+
     test_output_file = f'test_output_{user_cmd}.txt'
 
     # identify the test output file using the user command
-    
+
     # extract filename from STUDENT_MOVIE_QUEUE_FILE without file extension
     autotest_queue_file = f'{os.path.splitext(STUDENT_MOVIE_QUEUE_FILE)[0]}_{user_cmd}.txt'
 
     # make a copy of the movie queue file
-    rc = file_copy(STUDENT_MOVIE_QUEUE_FILE, autotest_queue_file, args=args)
+    rc = file_copy(STUDENT_MOVIE_QUEUE_FILE, autotest_queue_file)
     if rc != 0:
         report_failure(f'{autotest_queue_file} not constructed')
         return rc
@@ -540,54 +585,54 @@ def test_watch(args):
     autotest_history_file = f'{os.path.splitext(STUDENT_MOVIE_HISTORY_FILE)[0]}_{user_cmd}.txt'
 
     # make a copy of the movie history file
-    rc = file_copy(STUDENT_MOVIE_HISTORY_FILE, autotest_history_file, args=args)
+    rc = file_copy(STUDENT_MOVIE_HISTORY_FILE, autotest_history_file)
     if rc != 0:
         report_failure(f'{autotest_history_file} not constructed')
         return rc
-    
+
     # remove the first movie from the test movie queue file
-    with open(autotest_queue_file, 'r') as f:
+    with open(autotest_queue_file, 'r', encoding='utf-8') as f:
         lines = f.readlines()
-    with open(autotest_queue_file, 'w') as f:
+    with open(autotest_queue_file, 'w', encoding='utf-8') as f:
         f.writelines(lines[1:]) # remove the first movie
 
     # extract the first movie from the test movie queue file
     movie = lines[0].strip()
 
     # prepend the first movie to the test movie history file
-    with open(autotest_history_file, 'r') as f:
+    with open(autotest_history_file, 'r', encoding='utf-8') as f:
         lines = f.readlines()
-    with open(autotest_history_file, 'w') as f:
+    with open(autotest_history_file, 'w', encoding='utf-8') as f:
         f.write(movie + '\n') # prepend the first movie
-        f.writelines(lines) 
+        f.writelines(lines)
 
     # run the program
     cmd = f'{EXECUTABLE} < {input_file} > {test_output_file} 2>&1'
     rc = execute_command(cmd, args)
     if rc != 0:
-        return rc 
+        return rc
 
     # check that the updated movie queue file does not contain the first movie
     if args.verbose:
         report_info(f'Checking {movie} is not in {STUDENT_MOVIE_QUEUE_UPDATE_FILE}')
 
-    rc = file_diff(autotest_queue_file, 
+    rc = file_diff(autotest_queue_file,
                    STUDENT_MOVIE_QUEUE_UPDATE_FILE,
                    args=args)
     if rc != 0:
         report_failure(f'{movie} not removed from {STUDENT_MOVIE_QUEUE_UPDATE_FILE}')
-        return rc 
+        return rc
 
     # check that the updated movie history file contains the first movie
     if args.verbose:
         report_info(f'Checking {movie} is in {STUDENT_MOVIE_HISTORY_UPDATE_FILE}')
 
-    rc = file_diff(autotest_history_file, 
+    rc = file_diff(autotest_history_file,
                    STUDENT_MOVIE_HISTORY_UPDATE_FILE,
                    args=args)
     if rc != 0:
         report_failure(f'{movie} not added to {STUDENT_MOVIE_HISTORY_UPDATE_FILE}')
-        return rc 
+        return rc
 
     return rc
 
@@ -602,8 +647,8 @@ def test_delete(args):
     Returns:
         int: Return code indicating the success or failure of the test.
     """
-    if (copy_test_input_files() != 0):
-        report_failure(f'Unable to copy test input files')
+    if copy_test_input_files() != 0:
+        report_failure('Unable to copy test input files')
         return 1
 
     user_cmd = 'delete'
@@ -611,18 +656,18 @@ def test_delete(args):
     # build the command sequence into a string
     test_cmd = f'{USER_COMMANDS[user_cmd]}\n{USER_COMMANDS["exit"]}\n'
     input_file = f'test_input_{user_cmd}.txt'
-    with open(input_file, 'w') as f:
+    with open(input_file, 'w', encoding='utf-8') as f:
         f.write(test_cmd)
-    
+
     test_output_file = f'test_output_{user_cmd}.txt'
 
     # identify the test output file using the user command
-    
+
     # extract filename from STUDENT_MOVIE_QUEUE_FILE without file extension
     autotest_queue_file = f'{os.path.splitext(STUDENT_MOVIE_QUEUE_FILE)[0]}_{user_cmd}.txt'
 
     # make a copy of the movie queue file
-    rc = file_copy(STUDENT_MOVIE_QUEUE_FILE, autotest_queue_file, args=args)
+    rc = file_copy(STUDENT_MOVIE_QUEUE_FILE, autotest_queue_file)
     if rc != 0:
         report_failure(f'{autotest_queue_file} not constructed')
         return rc
@@ -631,15 +676,15 @@ def test_delete(args):
     autotest_history_file = f'{os.path.splitext(STUDENT_MOVIE_HISTORY_FILE)[0]}_{user_cmd}.txt'
 
     # make a copy of the movie history file
-    rc = file_copy(STUDENT_MOVIE_HISTORY_FILE, autotest_history_file, args=args)
+    rc = file_copy(STUDENT_MOVIE_HISTORY_FILE, autotest_history_file)
     if rc != 0:
         report_failure(f'{autotest_history_file} not constructed')
         return rc
 
     # remove the first movie from the test movie queue file
-    with open(autotest_queue_file, 'r') as f:
+    with open(autotest_queue_file, 'r', encoding='utf-8') as f:
         lines = f.readlines()
-    with open(autotest_queue_file, 'w') as f:
+    with open(autotest_queue_file, 'w', encoding='utf-8') as f:
         f.writelines(lines[1:]) # remove the first movie
 
     # extract the first movie from the test movie queue file
@@ -650,29 +695,29 @@ def test_delete(args):
     rc = execute_command(cmd, args)
     if rc != 0:
         return rc
-    
+
     # check that the updated movie queue file does not contain the first movie
     if args.verbose:
         report_info(f'Checking {movie} is not in {STUDENT_MOVIE_QUEUE_UPDATE_FILE}')
 
-    rc = file_diff(autotest_queue_file, 
+    rc = file_diff(autotest_queue_file,
                    STUDENT_MOVIE_QUEUE_UPDATE_FILE,
                    args=args)
     if rc != 0:
         report_failure(f'{movie} not removed from {STUDENT_MOVIE_QUEUE_UPDATE_FILE}')
-        return rc 
-    
+        return rc
+
     # make sure the updated movie history file is the same as the original
     if args.verbose:
         report_info(f'Checking {movie} is not in {STUDENT_MOVIE_HISTORY_UPDATE_FILE}')
 
-    rc = file_diff(autotest_history_file, 
+    rc = file_diff(autotest_history_file,
                    STUDENT_MOVIE_HISTORY_UPDATE_FILE,
                    args=args)
     if rc != 0:
         report_failure(f'{movie} present in {STUDENT_MOVIE_HISTORY_UPDATE_FILE}')
-        return rc 
-    
+        return rc
+
     return rc
 
 
@@ -686,8 +731,8 @@ def test_history(args):
     Returns:
         int: Return code indicating the success or failure of the test.
     """
-    if (copy_test_input_files() != 0):
-        report_failure(f'Unable to copy test input files')
+    if copy_test_input_files() != 0:
+        report_failure('Unable to copy test input files')
         return 1
 
     user_cmd = 'history'
@@ -695,9 +740,9 @@ def test_history(args):
     # build the command sequence into a string
     test_cmd = f'{USER_COMMANDS[user_cmd]}\n{USER_COMMANDS["exit"]}\n'
     input_file = f'test_input_{user_cmd}.txt'
-    with open(input_file, 'w') as f:
+    with open(input_file, 'w', encoding='utf-8') as f:
         f.write(test_cmd)
-    
+
     test_output_file = f'test_output_{user_cmd}.txt'
 
     # run the program
@@ -705,7 +750,7 @@ def test_history(args):
     rc = execute_command(cmd, args)
     if rc != 0:
         return rc
-    
+
     # check that the updated movie queue file does not contain the first movie
     if args.verbose:
         report_info(f'Checking if history is in {test_output_file}')
@@ -724,8 +769,8 @@ def test_recent(args):
     Returns:
         int: Return code indicating the success or failure of the test.
     """
-    if (copy_test_input_files() != 0):
-        report_failure(f'Unable to copy test input files')
+    if copy_test_input_files() != 0:
+        report_failure('Unable to copy test input files')
         return 1
 
     user_cmd = 'recent'
@@ -733,13 +778,13 @@ def test_recent(args):
     # build the command sequence into a string
     test_cmd = f'{USER_COMMANDS[user_cmd]}\n{USER_COMMANDS["exit"]}\n'
     input_file = f'test_input_{user_cmd}.txt'
-    with open(input_file, 'w') as f:
+    with open(input_file, 'w', encoding='utf-8') as f:
         f.write(test_cmd)
-    
+
     test_output_file = f'test_output_{user_cmd}.txt'
 
     # extract the first movie from the test movie history file
-    with open(STUDENT_MOVIE_HISTORY_FILE, 'r') as f:
+    with open(STUDENT_MOVIE_HISTORY_FILE, 'r', encoding='utf-8') as f:
         lines = f.readlines()
     movie = lines[0].strip()
 
@@ -748,7 +793,7 @@ def test_recent(args):
     rc = execute_command(cmd, args)
     if rc != 0:
         return rc
-    
+
     # check that the updated movie queue file does not contain the first movie
     if args.verbose:
         report_info(f'Checking if {movie} is in {test_output_file}')
@@ -767,8 +812,8 @@ def test_queue(args):
     Returns:
         int: Return code indicating the success or failure of the test.
     """
-    if (copy_test_input_files() != 0):
-        report_failure(f'Unable to copy test input files')
+    if copy_test_input_files() != 0:
+        report_failure('Unable to copy test input files')
         return 1
 
     user_cmd = 'queue'
@@ -776,9 +821,9 @@ def test_queue(args):
     # build the command sequence into a string
     test_cmd = f'{USER_COMMANDS[user_cmd]}\n{USER_COMMANDS["exit"]}\n'
     input_file = f'test_input_{user_cmd}.txt'
-    with open(input_file, 'w') as f:
+    with open(input_file, 'w', encoding='utf-8') as f:
         f.write(test_cmd)
-    
+
     test_output_file = f'test_output_{user_cmd}.txt'
 
     # run the program
@@ -786,7 +831,7 @@ def test_queue(args):
     rc = execute_command(cmd, args)
     if rc != 0:
         return rc
-    
+
     # check that the updated movie queue file does not contain the first movie
     if args.verbose:
         report_info(f'Checking if queue is in {test_output_file}')
@@ -805,8 +850,8 @@ def test_next(args):
     Returns:
         int: Return code indicating the success or failure of the test.
     """
-    if (copy_test_input_files() != 0):
-        report_failure(f'Unable to copy test input files')
+    if copy_test_input_files() != 0:
+        report_failure('Unable to copy test input files')
         return 1
 
     user_cmd = 'next'
@@ -814,13 +859,13 @@ def test_next(args):
     # build the command sequence into a string
     test_cmd = f'{USER_COMMANDS[user_cmd]}\n{USER_COMMANDS["exit"]}\n'
     input_file = f'test_input_{user_cmd}.txt'
-    with open(input_file, 'w') as f:
+    with open(input_file, 'w', encoding='utf-8') as f:
         f.write(test_cmd)
-    
+
     test_output_file = f'test_output_{user_cmd}.txt'
 
     # extract the first movie from the test movie queue file
-    with open(STUDENT_MOVIE_QUEUE_FILE, 'r') as f:
+    with open(STUDENT_MOVIE_QUEUE_FILE, 'r', encoding='utf-8') as f:
         lines = f.readlines()
     movie = lines[0].strip()
 
@@ -829,7 +874,7 @@ def test_next(args):
     rc = execute_command(cmd, args)
     if rc != 0:
         return rc
-    
+
     # check that the updated movie queue file does not contain the first movie
     if args.verbose:
         report_info(f'Checking if {movie} is in {test_output_file}')
@@ -845,34 +890,67 @@ def test_next(args):
 # Do not modify anything below this line
 #--------------------------------------------------------------------------
 def banner(msg, args):
+    """
+    Print a banner message for the test.
+
+    Args:
+        msg (str): The message to print.
+        args (argparse.Namespace): The command-line arguments.
+
+    Returns:
+        None
+    """
     if args.verbose:
         print(f'{BLUE}[==========]{RESET}')
         print(f'{BLUE}[   TEST   ] {msg}{RESET}')
         print(f'{BLUE}[==========]{RESET}')
 
 def footer(msg, rc, args):
+    """
+    Print a footer message for the test.
+
+    Args:
+        msg (str): The message to print.
+        rc (int): The return code of the test.
+        args (argparse.Namespace): The command-line arguments.
+
+    Returns:
+        None
+    """
     if args.verbose:
         print(f'{BLUE}[==========]{RESET}')
         print(f'{BLUE}[   END    ] {msg} rc: {rc}{RESET}')
         print(f'{BLUE}[==========]{RESET}')
 
 def parse_arguments():
+    """
+    Parse command-line arguments.
+
+    Returns:
+        argparse.Namespace: The parsed command-line arguments.
+    """
     parser = argparse.ArgumentParser()
-    parser.add_argument("-v", "--verbose", action="store_true", default=True, 
+    parser.add_argument("-v", "--verbose", action="store_true", default=True,
                         help="Enable verbose output")
-    parser.add_argument("-q", "--quiet", action="store_true", default=False, 
+    parser.add_argument("-q", "--quiet", action="store_true", default=False,
                         help="Enable quiet mode")
-    parser.add_argument("--nosetup", action="store_true", default=False, 
+    parser.add_argument("--nosetup", action="store_true", default=False,
                         help="Disable setup before running tests")
-    parser.add_argument("--nocleanup", action="store_true", default=False, 
+    parser.add_argument("--nocleanup", action="store_true", default=False,
                         help="Disable cleanup after running tests")
-    parser.add_argument("--debug", action="store_true", default=False, 
+    parser.add_argument("--debug", action="store_true", default=False,
                         help="Enable debug mode")
-    parser.add_argument("-t", "--test", nargs='+', type=str, default=None, 
+    parser.add_argument("-t", "--test", nargs='+', type=str, default=None,
                         help=f"Specify the test(s) to run from: {TEST_CASES}")
     return parser.parse_args()
 
 def test_main():
+    """
+    Main function to execute the tests.
+
+    Returns:
+        None
+    """
     args = parse_arguments()
 
     if args.quiet:
@@ -910,6 +988,12 @@ def test_main():
     sys.exit(rc)
 
 def main():
+    """
+    Main entry point of the script.
+
+    Returns:
+        None
+    """
     test_main()
 
 if __name__ == "__main__":
